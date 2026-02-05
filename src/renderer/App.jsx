@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import { UploadCloud, CheckCircle, Loader2, Image as ImageIcon } from 'lucide-react'
 
 function App() {
@@ -7,6 +7,55 @@ function App() {
     const [progress, setProgress] = useState(0)
     const [history, setHistory] = useState([])
     const [status, setStatus] = useState('Ready to tag')
+
+    const HISTORY_KEY = 'tagger.history.v1'
+    const MAX_HISTORY = 50
+
+    const saveHistory = useCallback((items) => {
+        try {
+            localStorage.setItem(HISTORY_KEY, JSON.stringify(items))
+        } catch (err) {
+            console.warn('Unable to save history', err)
+        }
+    }, [])
+
+    useEffect(() => {
+        const loadHistory = async () => {
+            let stored = []
+            try {
+                const raw = localStorage.getItem(HISTORY_KEY)
+                stored = raw ? JSON.parse(raw) : []
+            } catch (err) {
+                stored = []
+            }
+
+            if (!stored.length) {
+                setHistory([])
+                return
+            }
+
+            const checks = await Promise.all(
+                stored.map(async (item) => {
+                    const ok = await window.api.fileExists(item.filePath)
+                    if (!ok) return null
+                    let previewUrl = item.previewUrl || null
+                    if (!previewUrl || previewUrl.startsWith('file:')) {
+                        previewUrl = await window.api.getThumbnail(item.filePath, 96)
+                    }
+                    return {
+                        ...item,
+                        previewUrl: previewUrl || null
+                    }
+                })
+            )
+
+            const filtered = checks.filter(Boolean)
+            setHistory(filtered)
+            saveHistory(filtered)
+        }
+
+        loadHistory()
+    }, [saveHistory])
 
     const onDragOver = (e) => {
         e.preventDefault()
@@ -39,21 +88,36 @@ function App() {
 
             try {
                 const metadata = await window.api.getImageTone(filePath)
-                if (metadata && metadata[0] && metadata[0].ImageTone) {
-                    const tone = metadata[0].ImageTone
-                    const finalTag = `${tone} Film Recipe`
+                if (!metadata || !metadata[0] || !metadata[0].ImageTone) {
+                    setStatus(`No ImageTone found for ${file.name}`)
+                    continue
+                }
 
-                    await window.api.tagImage(filePath, finalTag)
+                const tone = metadata[0].ImageTone
+                const finalTag = `${tone} Film Recipe`
 
-                    setHistory(prev => [{
+                const tagResult = await window.api.tagImage(filePath, finalTag)
+                if (tagResult && tagResult.skipped) {
+                    setStatus(`Already tagged: ${file.name}`)
+                    continue
+                }
+                const previewUrl = await window.api.getThumbnail(filePath, 96)
+
+                setHistory(prev => {
+                    const updated = [{
                         id: Date.now() + i,
                         filename: file.name,
+                        filePath,
                         tone: tone,
-                        timestamp: new Date().toLocaleTimeString()
-                    }, ...prev].slice(0, 10))
-                }
+                        timestamp: new Date().toLocaleTimeString(),
+                        previewUrl
+                    }, ...prev].slice(0, MAX_HISTORY)
+                    saveHistory(updated)
+                    return updated
+                })
             } catch (err) {
                 console.error(`Error processing ${file.name}:`, err)
+                setStatus(`Error tagging ${file.name}`)
             }
 
             setProgress(((i + 1) / imageFiles.length) * 100)
@@ -75,7 +139,7 @@ function App() {
                 </div>
                 <div className="window-controls">
                     <button className="control-btn minimize" onClick={() => window.api.minimize()} />
-                    <button className="control-btn close" onClick={() => window.api.close()} />
+                    <button className="control-btn close" onClick={() => window.api.quit()} />
                 </div>
             </div>
 
@@ -107,15 +171,32 @@ function App() {
                 </main>
 
                 <aside className="sidebar">
-                    <h2>Recently Tagged</h2>
+                    <div className="sidebar-header">
+                        <h2>Recently Tagged</h2>
+                        <button
+                            className="history-clear"
+                            title="Clear history"
+                            onClick={() => {
+                                setHistory([])
+                                saveHistory([])
+                            }}
+                        >
+                            <span aria-hidden="true">Clear</span>
+                        </button>
+                    </div>
                     <div className="history-list">
                         {history.length === 0 ? (
                             <p style={{ color: 'var(--text-muted)', fontSize: '12px' }}>No images tagged yet.</p>
                         ) : (
                             history.map(item => (
                                 <div key={item.id} className="history-item">
-                                    <span className="filename">{item.filename}</span>
-                                    <span className="tag">{item.tone}</span>
+                                    {item.previewUrl ? (
+                                        <img src={item.previewUrl} alt={item.filename} className="history-thumb" />
+                                    ) : null}
+                                    <div className="history-meta">
+                                        <span className="filename">{item.filename}</span>
+                                        <span className="tag">{item.tone}</span>
+                                    </div>
                                 </div>
                             ))
                         )}

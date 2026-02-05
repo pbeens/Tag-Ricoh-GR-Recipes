@@ -7,8 +7,9 @@ dist/
 build/
 Test-Programs/*
 
-# ExifTool files (already in resources, but should be excluded from Git if they are binary artifacts)
+# ExifTool files (downloaded or bundled artifacts)
 resources/exiftool_files/
 resources/exiftool.exe
+resources/exiftool-mac/
 Test_Images_All_Full_Size.zip
 Test-Images/Archive.zip

@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, nativeImage } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { spawn } from 'child_process'
@@ -52,6 +52,24 @@ app.whenReady().then(() => {
   })
 
   ipcMain.handle('tag-image', async (event, filePath, tone) => {
+    const existing = await runExifTool(['-json', '-Keywords', '-Subject', filePath])
+    if (Array.isArray(existing) && existing[0]) {
+      const keywords = new Set()
+      const add = (value) => {
+        if (Array.isArray(value)) {
+          value.forEach((v) => keywords.add(String(v)))
+        } else if (typeof value === 'string') {
+          value.split(',').map((v) => v.trim()).filter(Boolean).forEach((v) => keywords.add(v))
+        }
+      }
+      add(existing[0].Keywords)
+      add(existing[0].Subject)
+
+      if (keywords.has(tone)) {
+        return { skipped: true, reason: 'already-tagged' }
+      }
+    }
+
     return await runExifTool([
       '-P',
       '-overwrite_original',
@@ -59,6 +77,28 @@ app.whenReady().then(() => {
       `-Subject+=${tone}`,
       filePath
     ])
+  })
+
+  ipcMain.handle('file-exists', async (event, filePath) => {
+    if (!filePath) return false
+    try {
+      return fs.existsSync(filePath)
+    } catch (e) {
+      return false
+    }
+  })
+
+  ipcMain.handle('get-thumbnail', async (event, filePath, size = 96) => {
+    if (!filePath) return null
+    try {
+      if (!fs.existsSync(filePath)) return null
+      const image = nativeImage.createFromPath(filePath)
+      if (image.isEmpty()) return null
+      const resized = image.resize({ width: size, height: size, quality: 'good' })
+      return resized.toDataURL()
+    } catch (e) {
+      return null
+    }
   })
 
   ipcMain.on('window-minimize', () => {
@@ -77,6 +117,10 @@ app.whenReady().then(() => {
     BrowserWindow.getFocusedWindow()?.close()
   })
 
+  ipcMain.on('app-quit', () => {
+    app.quit()
+  })
+
   createWindow()
 
   app.on('activate', function () {
@@ -92,26 +136,66 @@ app.on('window-all-closed', () => {
 
 async function runExifTool(args) {
   return new Promise((resolve, reject) => {
-    const scriptDir = app.getAppPath()
-    let finalPath = path.join(scriptDir, 'resources', 'exiftool.exe')
-    
-    if (!fs.existsSync(finalPath)) {
-        finalPath = path.join(scriptDir, 'exiftool.exe')
+    const devBase = app.getAppPath()
+    const resourceBase = app.isPackaged ? process.resourcesPath : devBase
+    const resolveResource = (packagedRel, devRel) =>
+      app.isPackaged ? path.join(resourceBase, packagedRel) : path.join(devBase, devRel)
+    const candidates = []
+
+    if (process.platform === 'win32') {
+      candidates.push(resolveResource('exiftool.exe', 'resources/exiftool.exe'))
+      candidates.push(path.join(devBase, 'exiftool.exe'))
+    } else if (process.platform === 'darwin') {
+      candidates.push(resolveResource('exiftool-mac/bin/exiftool', 'resources/exiftool-mac/bin/exiftool'))
+      candidates.push(path.join(devBase, 'exiftool-mac', 'bin', 'exiftool'))
+      candidates.push('exiftool')
+    } else {
+      // Use system exiftool on macOS/Linux
+      candidates.push('exiftool')
     }
 
-    const process = spawn(finalPath, args)
+    let finalPath = candidates.find((candidate) => {
+      if (candidate === 'exiftool') return true
+      return fs.existsSync(candidate)
+    })
+
+    if (!finalPath) {
+      if (process.platform === 'win32') {
+        reject(
+          new Error(
+            'ExifTool not found. Expected resources/exiftool.exe or exiftool.exe in the app directory.'
+          )
+        )
+        return
+      }
+      finalPath = 'exiftool'
+    }
+
+    const child = spawn(finalPath, args)
     let stdout = ''
     let stderr = ''
 
-    process.stdout.on('data', (data) => {
+    child.stdout.on('data', (data) => {
       stdout += data.toString()
     })
 
-    process.stderr.on('data', (data) => {
+    child.stderr.on('data', (data) => {
       stderr += data.toString()
     })
 
-    process.on('close', (code) => {
+    child.on('error', (err) => {
+      if (err && err.code === 'ENOENT') {
+        reject(
+          new Error(
+            'ExifTool not found. On macOS/Linux, install it and ensure `exiftool` is on your PATH.'
+          )
+        )
+        return
+      }
+      reject(err)
+    })
+
+    child.on('close', (code) => {
       if (code === 0) {
         try {
           if (args.includes('-json')) {

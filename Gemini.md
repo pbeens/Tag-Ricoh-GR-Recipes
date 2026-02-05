@@ -54,3 +54,4 @@ To provide a consistent environment for testing, use the provided test assets:
 Put every development iteration, successful or not, in the `DEV_NOTES.md` file. Include the date and time of each iteration, and a **Verification** section providing clear instructions for the user to test and validate the changes.
 
 Additionally, maintain a **Backlog & Feature Ideas** section at the end of `DEV_NOTES.md` to track planned improvements, things to verify in the future, and new feature requests.
+The **Backlog & Feature Ideas** section must always be the final section in `DEV_NOTES.md` (keep it at the bottom).

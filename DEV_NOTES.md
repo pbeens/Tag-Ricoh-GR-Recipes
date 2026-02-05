@@ -200,6 +200,222 @@
 - **UI**: Premium matching design proposal.
 - **Features**: Drag-and-drop JPEG tagging working; custom window controls active; Git clean.
 
+## Iteration 17: Local Tag Scanner Script
+
+**Timestamp**: 2026-02-05 07:49 - 07:52
+
+- **Goal**: Provide a quick local script to list image tags for the test images.
+- **Action**:
+  - Added `test programs/scan_image_tags.py` to scan `Test-Images` and print tags or `none`.
+- **Verification**:
+  - [ ] **Run Script**: Execute `python3 "test programs/scan_image_tags.py"` and confirm each file prints a line with tags or `none`.
+  - [ ] **Custom Folder**: Execute `python3 "test programs/scan_image_tags.py" /path/to/images` to scan a different folder.
+
+## Iteration 18: Cross-Platform ExifTool Resolution
+
+**Timestamp**: 2026-02-05 07:56 - 07:58
+
+- **Goal**: Prevent main-process crashes when ExifTool is missing on macOS/Linux.
+- **Action**:
+  - Updated `runExifTool` to use the system `exiftool` on non-Windows platforms and added clearer ENOENT error messaging.
+  - Kept Windows lookup for `resources/exiftool.exe` and app-root `exiftool.exe`.
+- **Verification**:
+  - [ ] **macOS/Linux**: Install ExifTool (`exiftool -ver`) and run `npm run dev`, then tag an image; app should not crash.
+  - [ ] **Windows**: Ensure `resources/exiftool.exe` exists; tag an image and confirm tags are written.
+
+## Iteration 19: Tagging Diagnostics + ExifTool-Based Scanner
+
+**Timestamp**: 2026-02-05 08:01 - 08:04
+
+- **Goal**: Make tagging failures visible and improve tag scanning accuracy.
+- **Action**:
+  - Added main-process logging for ExifTool command execution.
+  - Updated renderer to surface missing ImageTone and tagging errors in the status badge.
+  - Enhanced `test programs/scan_image_tags.py` to use ExifTool (if installed) to read Keywords/Subject/ IPTC/XMP.
+- **Verification**:
+  - [ ] **Run App**: Drag a Ricoh GR JPEG and confirm status updates on success or error.
+  - [ ] **Run Scanner**: Execute `python3 "test programs/scan_image_tags.py"` and confirm tags show if present.
+
+## Iteration 20: Fix Process Shadowing Crash in ExifTool Runner
+
+**Timestamp**: 2026-02-05 08:06 - 08:07
+
+- **Goal**: Resolve the `Cannot access 'process2' before initialization` error in the main process.
+- **Action**:
+  - Renamed the spawned child process variable to avoid shadowing Node's global `process`.
+- **Verification**:
+  - [ ] **Run App**: `npm run dev` and drag-drop an image; no `process2` error should appear.
+
+## Iteration 21: Recently Tagged Thumbnails
+
+**Timestamp**: 2026-02-05 08:10 - 08:12
+
+- **Goal**: Show image thumbnails in the "Recently Tagged" panel.
+- **Action**:
+  - Stored a file-based preview URL for each tagged image.
+  - Updated the sidebar list to render thumbnails alongside filename and recipe tag.
+- **Verification**:
+  - [ ] **Thumbnail Check**: Drag a few images and confirm the right panel shows a thumbnail for each recently tagged image.
+  - [ ] **Layout Check**: Confirm filenames and tags remain readable next to the thumbnail.
+
+## Iteration 22: Persistent Recently Tagged History
+
+**Timestamp**: 2026-02-05 08:16 - 08:19
+
+- **Goal**: Preserve a recent history of tagged images between app runs and prune missing files.
+- **Action**:
+  - Added IPC `file-exists` to validate stored history entries.
+  - Persisted `history` to localStorage and reload it on startup, removing missing files silently.
+- **Verification**:
+  - [ ] **Persistence**: Tag 2–3 images, quit the app, relaunch, and confirm they still appear in Recently Tagged.
+  - [ ] **Prune**: Move one tagged image out of the folder, relaunch, and confirm it disappears from Recently Tagged without errors.
+
+## Iteration 23: Reliable Thumbnail URLs
+
+**Timestamp**: 2026-02-05 08:23 - 08:25
+
+- **Goal**: Fix broken thumbnail URLs in the Recently Tagged panel.
+- **Action**:
+  - Exposed `pathToFileUrl` from preload using Node's URL utilities.
+  - Rebuilt preview URLs from file paths when loading history and when tagging.
+- **Verification**:
+  - [ ] **Thumbnail Check**: Drag a few images and confirm thumbnails render (no broken image icon).
+  - [ ] **Relaunch Check**: Restart the app and confirm thumbnails still render for saved history.
+
+## Iteration 24: Thumbnail Rendering via NativeImage
+
+**Timestamp**: 2026-02-05 08:30 - 08:32
+
+- **Goal**: Fix broken image icons in Recently Tagged.
+- **Action**:
+  - Added IPC `get-thumbnail` to generate a resized data URL via Electron `nativeImage`.
+  - Switched history thumbnails to use data URLs instead of `file://` paths.
+- **Verification**:
+  - [ ] **Thumbnail Check**: Drag images and confirm actual thumbnails render (no placeholder icon).
+  - [ ] **Relaunch Check**: Restart and confirm thumbnails persist in Recently Tagged.
+
+## Iteration 25: Red Close Button Quits App on macOS
+
+**Timestamp**: 2026-02-05 08:36 - 08:37
+
+- **Goal**: Ensure the red close control fully quits the app on macOS.
+- **Action**:
+  - Added an `app-quit` IPC channel and wired the red button to call `app.quit()`.
+- **Verification**:
+  - [ ] **Quit Test**: Run `npm run dev`, click the red close button, and confirm the app process exits.
+
+## Iteration 26: History Cap + Thumbnail Refresh
+
+**Timestamp**: 2026-02-05 08:44 - 08:46
+
+- **Goal**: Limit history growth and fix stale thumbnail URLs from earlier runs.
+- **Action**:
+  - Capped Recently Tagged history at 50 items.
+  - Regenerated thumbnails when stored previews are missing or `file://` based.
+- **Verification**:
+  - [ ] **Cap Check**: Tag more than 50 images; list should never exceed 50.
+  - [ ] **Refresh Check**: Restart app and confirm older entries now show real thumbnails.
+
+## Iteration 27: Clear History Control
+
+**Timestamp**: 2026-02-05 08:50 - 08:52
+
+- **Goal**: Allow users to clear the Recently Tagged history.
+- **Action**:
+  - Added a "Clear" button in the sidebar header that wipes history and localStorage.
+- **Verification**:
+  - [ ] **Clear Test**: Tag a few images, click "Clear", and confirm the list is empty after restart.
+
+## Iteration 28: Prevent Duplicate Tags
+
+**Timestamp**: 2026-02-05 08:56 - 08:58
+
+- **Goal**: Avoid adding duplicate recipe tags when an image is re-processed.
+- **Action**:
+  - Read existing Keywords/Subject via ExifTool before tagging.
+  - Skip tagging when the desired tag already exists and surface a status message.
+- **Verification**:
+  - [ ] **Duplicate Test**: Tag an image twice; second pass should skip and not duplicate the tag.
+
+## Iteration 29: Remove ExifTool Console Noise
+
+**Timestamp**: 2026-02-05 09:02 - 09:03
+
+- **Goal**: Reduce console log noise during tagging.
+- **Action**:
+  - Removed the ExifTool command logging line.
+- **Verification**:
+  - [ ] **Noise Check**: Run `npm run dev`, tag images, and confirm ExifTool commands are no longer printed.
+
+## Iteration 30: Bundle ExifTool for macOS
+
+**Timestamp**: 2026-02-05 09:14 - 09:20
+
+- **Goal**: Bundle ExifTool for macOS so the app runs without system installs.
+- **Action**:
+  - Copied Homebrew ExifTool into `resources/exiftool-mac/` (bin + libexec).
+  - Patched the bundled `exiftool` script to use relative lib paths and a portable shebang (`#!/usr/bin/env perl`).
+  - Updated `runExifTool` to prefer the bundled macOS binary and fall back to system `exiftool`.
+- **Verification**:
+  - [ ] **Bundled Run**: Temporarily move `/opt/homebrew/bin/exiftool` aside and confirm the app still tags images.
+  - [ ] **Path Check**: Confirm `resources/exiftool-mac/bin/exiftool` runs from the repo: `resources/exiftool-mac/bin/exiftool -ver`.
+
+### Windows Notes (For Anti-Gravity)
+
+**What Windows still needs**:
+- Place a Windows ExifTool binary at `resources/exiftool.exe` (rename `exiftool(-k).exe` to `exiftool.exe`).
+- Add an `extraResources` entry for `resources/exiftool.exe` in `package.json` build config.
+
+**Suggested Anti-Gravity prompt**:
+"Bundle ExifTool for Windows in this Electron app. Download the Windows ExifTool zip, place `exiftool.exe` into `resources/`, and make sure the build/packaging config ships the `resources` folder. Confirm `runExifTool` checks `resources/exiftool.exe` and update dev notes with verification steps."
+
+## Iteration 31: Production Packaging Setup (macOS)
+
+**Timestamp**: 2026-02-05 09:32 - 09:36
+
+- **Goal**: Prepare the app for DMG packaging with bundled macOS ExifTool.
+- **Action**:
+  - Added `electron-builder` config and scripts for `pack`/`dist`.
+  - Updated ExifTool resolution to use `process.resourcesPath` when packaged.
+  - Added `extraResources` to include `resources/exiftool-mac` in builds.
+- **Verification**:
+  - [ ] **Install Deps**: Run `npm install` to fetch `electron-builder`.
+  - [ ] **Pack Test**: Run `npm run pack` and confirm the app launches from the output directory.
+  - [ ] **DMG Build**: Run `npm run dist` and verify a DMG is produced under `dist/`.
+
+## Iteration 32: Fix DMG Codesign Permission Error
+
+**Timestamp**: 2026-02-05 09:44 - 09:46
+
+- **Goal**: Resolve macOS codesign failure when packaging ExifTool resources.
+- **Action**:
+  - Normalized permissions under `resources/exiftool-mac` to be readable during codesigning.
+- **Verification**:
+  - [ ] **DMG Build**: Run `npm run dist` and confirm DMG is created without permission errors.
+
+## Iteration 33: ExifTool Fetch Script + Repo Cleanup
+
+**Timestamp**: 2026-02-05 10:02 - 10:07
+
+- **Goal**: Keep the repo lean while still bundling ExifTool for macOS builds.
+- **Action**:
+  - Added `scripts/fetch_exiftool_macos.sh` to download and stage ExifTool locally.
+  - Ignored `resources/exiftool-mac/` in `.gitignore` and wired `fetch:exiftool:mac` into build scripts.
+  - Updated README dev steps to run the fetch script on macOS.
+- **Verification**:
+  - [ ] **Fetch**: Run `npm run fetch:exiftool:mac` and confirm `resources/exiftool-mac/bin/exiftool -ver` works.
+  - [ ] **Build**: Run `npm run dist` and confirm a DMG is produced.
+
+## Iteration 34: Add Changelog
+
+**Timestamp**: 2026-02-05 10:18 - 10:20
+
+- **Goal**: Add a release changelog for v1.0.0.
+- **Action**:
+  - Created `CHANGELOG.md` with v1.0.0 notes.
+- **Verification**:
+  - [ ] **Review**: Open `CHANGELOG.md` and confirm the entries reflect the current release.
+
 ## Backlog & Feature Ideas
 
 ### Things to Do
@@ -221,3 +437,5 @@
 - [ ] **Custom Tagging**: Allow users to manually override a recipe if the metadata is missing.
 - [ ] **Export History**: Export the tagging logs as a CSV for photography records.
 - [ ] **Automated Updates**: Check for new bundled ExifTool versions.
+
+

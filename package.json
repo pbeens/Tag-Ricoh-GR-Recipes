@@ -6,6 +6,9 @@
   "scripts": {
     "dev": "electron-vite dev",
     "build": "electron-vite build",
+    "fetch:exiftool:mac": "bash scripts/fetch_exiftool_macos.sh",
+    "pack": "npm run fetch:exiftool:mac && electron-vite build && electron-builder --dir",
+    "dist": "npm run fetch:exiftool:mac && electron-vite build && electron-builder",
     "preview": "electron-vite preview",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -16,6 +19,7 @@
   "devDependencies": {
     "@vitejs/plugin-react": "^5.1.3",
     "electron": "^40.1.0",
+    "electron-builder": "^26.0.0",
     "electron-vite": "^5.0.0",
     "lucide-react": "^0.563.0",
     "vite": "^7.3.1"
@@ -25,5 +29,25 @@
     "@electron-toolkit/utils": "^4.0.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4"
+  },
+  "build": {
+    "appId": "com.ricoh.gr.tagger",
+    "productName": "Ricoh GR Image Tagger",
+    "files": [
+      "out/**",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "resources/exiftool-mac",
+        "to": "exiftool-mac"
+      }
+    ],
+    "mac": {
+      "target": [
+        "dmg"
+      ],
+      "category": "public.app-category.photography"
+    }
   }
 }

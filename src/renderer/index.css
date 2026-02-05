@@ -190,6 +190,30 @@ body {
     letter-spacing: 1.5px;
 }
 
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.history-clear {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    border-radius: 999px;
+    padding: 6px 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.history-clear:hover {
+    color: var(--text-main);
+    border-color: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.08);
+}
+
 .history-list {
     display: flex;
     flex-direction: column;
@@ -202,6 +226,10 @@ body {
     padding: 16px;
     border-radius: 16px;
     transition: all 0.2s ease;
+    display: grid;
+    grid-template-columns: 72px 1fr;
+    gap: 14px;
+    align-items: center;
 }
 
 .history-item:hover {
@@ -209,11 +237,25 @@ body {
     border-color: rgba(255, 255, 255, 0.2);
 }
 
+.history-thumb {
+    width: 72px;
+    height: 72px;
+    border-radius: 12px;
+    object-fit: cover;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
+}
+
+.history-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
 .history-item .filename {
     font-size: 13px;
     font-weight: 500;
     display: block;
-    margin-bottom: 8px;
     word-break: break-all;
 }
 
