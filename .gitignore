@@ -10,3 +10,4 @@ Test-Programs/*
 # ExifTool files (already in resources, but should be excluded from Git if they are binary artifacts)
 resources/exiftool_files/
 resources/exiftool.exe
+Test_Images_All_Full_Size.zip
