@@ -4,7 +4,7 @@ A premium desktop application designed for Ricoh GR photographers to automatical
 
 ## Overview
 
-The Ricoh GR Image Tagger streamlines your post-processing workflow by automatically extracting the **Image Tone** (e.g., "Negative Film", "Positive Film") from your photos' EXIF data and writing it to the **Keywords** and **Subject** tags. This makes your recipes searchable in Adobe Lightroom, Capture One, and Windows File Explorer.
+The Ricoh GR Image Tagger streamlines your post-processing workflow by automatically extracting the **Image Tone** (e.g., "Negative Film", "Positive Film") from your photos' EXIF data and writing it to the **Keywords** and **Subject** tags. This makes your recipes searchable in Adobe Lightroom and Capture One.
 
 > [!IMPORTANT]
  **Metadata Preservation**: This program relies on extracting the original "Image Tone" field from your camera's EXIF data. While you can safely import your images to your computer, some programs (like Adobe Lightroom, Capture One, or Windows Photos) may strip or alter this specific metadata if you **edit or tag** the images within them.
