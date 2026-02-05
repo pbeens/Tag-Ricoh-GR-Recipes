@@ -7,8 +7,8 @@
     "dev": "electron-vite dev",
     "build": "electron-vite build",
     "fetch:exiftool:mac": "bash scripts/fetch_exiftool_macos.sh",
-    "pack": "npm run fetch:exiftool:mac && electron-vite build && electron-builder --dir",
-    "dist": "npm run fetch:exiftool:mac && electron-vite build && electron-builder",
+    "pack": "electron-vite build && electron-builder --dir",
+    "dist": "electron-vite build && electron-builder",
     "preview": "electron-vite preview",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -41,6 +41,14 @@
       {
         "from": "resources/exiftool-mac",
         "to": "exiftool-mac"
+      },
+      {
+        "from": "resources/exiftool.exe",
+        "to": "exiftool.exe"
+      },
+      {
+        "from": "resources/exiftool_files",
+        "to": "exiftool_files"
       }
     ],
     "mac": {

@@ -6,6 +6,11 @@ A premium desktop application designed for Ricoh GR photographers to automatical
 
 The Ricoh GR Image Tagger streamlines your post-processing workflow by automatically extracting the **Image Tone** (e.g., "Negative Film", "Positive Film") from your photos' EXIF data and writing it to the **Keywords** and **Subject** tags. This makes your recipes searchable in Adobe Lightroom, Capture One, and Windows File Explorer.
 
+> [!IMPORTANT]
+ **Metadata Preservation**: This program relies on extracting the original "Image Tone" field from your camera's EXIF data. While you can safely import your images to your computer, some programs (like Adobe Lightroom, Capture One, or Windows Photos) may strip or alter this specific metadata if you **edit or tag** the images within them.
+>
+> **Best Practice**: Use this program to tag your images **first**—directly after importing them to your computer—before performing any edits or adding other tags in external software.
+
 ## Key Features
 
 - **Stunning UI**: A modern, dark-themed interface featuring glassmorphism and sunset-themed accents.
@@ -32,11 +37,13 @@ The release builds include a bundled copy of ExifTool, so no extra installs are 
 
 ## Build From Source (macOS)
 
-### Prerequisites
+### macOS Prerequisites
+
 - **Node.js** (LTS recommended) and **npm**
 - **Git**
 
-### Setup & Run (Dev)
+### macOS Setup & Run (Dev)
+
 ```bash
 git clone https://github.com/pbeens/Tag-Ricoh-GR-Recipes.git
 cd Tag-Ricoh-GR-Recipes
@@ -46,6 +53,7 @@ npm run dev
 ```
 
 ### Build a DMG
+
 ```bash
 npm run dist
 ```
@@ -54,12 +62,14 @@ The DMG will be created under `dist/`.
 
 ## Build From Source (Windows)
 
-### Prerequisites
+### Windows Prerequisites
+
 - **Node.js** (LTS recommended) and **npm**
 - **Git**
 - **ExifTool** for Windows
 
-### Setup & Run (Dev)
+### Windows Setup & Run (Dev)
+
 ```bat
 git clone https://github.com/pbeens/Tag-Ricoh-GR-Recipes.git
 cd Tag-Ricoh-GR-Recipes
@@ -68,10 +78,13 @@ npm run dev
 ```
 
 ### ExifTool (Windows)
-Place `exiftool.exe` in `resources/` so the app can find it during development and packaging.
+
+Ensure `exiftool.exe` and the `exiftool_files` directory are placed in the `resources/` folder. You can download the Windows executable from the [ExifTool website](https://exiftool.org/) (rename `exiftool(-k).exe` to `exiftool.exe`).
 
 ### Build an EXE (Windows)
+
 ```bat
+npm run build
 npm run dist
 ```
 
