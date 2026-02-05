@@ -150,6 +150,39 @@
   - [ ] **Git Test**: Check your Git status; the file count should drop from 7000+ to under 100.
   - [ ] **Tagging Test**: Drag a JPEG into the app; verify the terminal no longer shows "File not found - undefined" and the sidebar shows the tagged result.
 
+## Iteration 13: Production Documentation Overhaul
+
+**Timestamp**: 2026-02-04 21:26 - 21:28
+
+- **Goal**: Rebrand the project as a v1.0.0 production standalone application.
+- **Action**:
+  - Rewrote `README.md` to focus exclusively on the Electron application.
+  - Removed all legacy references to Python scripts and internal conversion notes.
+  - Updated feature list to highlight premium UI and batched processing.
+- **Verification**:
+  - [ ] **README Review**: Read the new `README.md` and confirm it reads like a professional product manual.
+
+## Iteration 14: Community Support Refinement
+
+**Timestamp**: 2026-02-04 21:27 - 21:28
+
+- **Goal**: Direct all public support to GitHub Issues and remove internal documentation references from `README.md`.
+- **Action**:
+  - Updated `README.md` to point users to the repository's "Issues" area.
+  - Removed all mentions of `DEV_NOTES.md` from the public-facing documentation.
+- **Verification**:
+  - [ ] **README Review**: Confirm the "Community & Support" section only mentions GitHub Issues.
+
+## Iteration 15: Camera Compatibility Generalization
+
+**Timestamp**: 2026-02-04 21:28 - 21:29
+
+- **Goal**: Generalize the target camera series to avoid inaccuracy regarding specific models.
+- **Action**:
+  - Updated `README.md` to refer to "Ricoh GR series" instead of "III and IV".
+- **Verification**:
+  - [ ] **README Review**: Confirm the footer says "Developed for the Ricoh GR series."
+
 ## Current Status
 
 - **Dev Mode**: Fully functional with `npm run dev`.

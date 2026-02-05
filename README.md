@@ -1,85 +1,39 @@
-# Ricoh GR IV Recipe Tagger
+# Ricoh GR Image Tagger v1.0.0
 
-A collection of tools and images for discovering and managing Ricoh GR IV image processing "recipes".
+A premium desktop application designed for Ricoh GR photographers to automatically tag their JPEGs with "Film Recipe" metadata.
 
 ## Overview
 
-This repository contains:
-- **Test-Images**: A set of sample JPEG images taken with a Ricoh GR IV using various Image Control settings.
-- **Test-Programs**: Utility scripts to extract and manage metadata from these images.
+The Ricoh GR Image Tagger streamlines your post-processing workflow by automatically extracting the **Image Tone** (e.g., "Negative Film", "Positive Film") from your photos' EXIF data and writing it to the **Keywords** and **Subject** tags. This makes your recipes searchable in Adobe Lightroom, Capture One, and Windows File Explorer.
 
-## Getting Started
+## Key Features
 
-### Prerequisites
+- **Stunning UI**: A modern, dark-themed interface featuring glassmorphism and sunset-themed accents.
+- **Drag-and-Drop Workflow**: Simply drag your JPEGs onto the application to start tagging.
+- **Zero Configuration**: Comes bundled with ExifTool—no manual installation or command-line knowledge required.
+- **Batched Processing**: Process dozens of high-resolution images in seconds.
+- **History Tracking**: Keep track of your recently tagged images and their extracted recipes directly in the sidebar.
+- **Lossless Tagging**: Preserves the "Date Modified" of your files while adding metadata.
 
-To use the discovery tools, you need:
-1.  **Python 3.x**: [Download Python](https://www.python.org/downloads/)
-2.  **ExifTool**: A powerful command-line application for metadata management.
-    - **Download**: [exiftool.org](https://exiftool.org/) (Download the "Windows Executable" `.zip`).
-    - **Setup**: 
-        1. Extract the `.zip` file.
-        2. **Option A**: Place the extracted `exiftool(-k).exe` directly in the `Test-Programs` folder (no renaming required!).
-        3. **Option B**: Rename it to `exiftool.exe` and add it to your system's PATH (e.g., put it in `C:\Windows`).
+## How to Use
 
-### Usage
+1. **Launch**: Open `Ricoh GR Image Tagger.exe`.
+2. **Import**: Drag a folder or a selection of JPEGs into the central drop zone.
+3. **Wait**: The app will automatically read the "Image Tone" and apply the corresponding tag (e.g., `Negative Film Film Recipe`).
+4. **Done**: Your files are now updated and will appear in the "Recently Tagged" sidebar.
 
-To extract recipes from the provided test images:
+## Technical Details
 
-1.  Open a terminal/command prompt.
-2.  Navigate to the `Test-Programs` directory:
-    ```bash
-    cd Test-Programs
-    ```
-3.  Run the discovery script:
-    ```bash
-    python discover_recipes.py
-    ```
+Built with a modern stack for performance and aesthetics:
 
-The script will:
-- Scan the `../Test-Images` folder.
-- Extract MakerNote settings (Saturation, Contrast, etc.) using `exiftool`.
-- **Smart Update**: Automatically replace the content between the markers in this `README.md` with the latest results.
+- **Framework**: Electron
+- **Frontend**: React + Vite
+- **Metadata Engine**: Bundles ExifTool for robust industry-standard metadata handling.
+- **Design**: custom Vanilla CSS with dark-mode optimizations.
 
-## Community Contributions
+## Community & Support
 
-If you have unique Ricoh GR IV recipes, feel free to contribute!
-1.  Upload your sample image to `Test-Images` with a descriptive filename (e.g., `MyCustomRecipe.jpg`).
-2.  Run the `discover_recipes.py` script to update the metadata registry.
-3.  Submit a Pull Request.
+This project is dedicated to the Ricoh GR community. If you encounter any issues, have feature requests, or want to contribute, please use the **GitHub Issues** area of this repository.
 
 ---
-<!-- DISCOVERED RECIPES START -->
-
-## Discovered Recipes
-
-```json
-{
-    "IV-001448 - Unknown": {
-        "ImageTone": "Hi-contrast B&W",
-        "Saturation": "Normal",
-        "Contrast": "Normal"
-    },
-    "IV-001449 - Cross Processing 2": {
-        "ImageTone": "Cross Processing 2",
-        "Saturation": "Normal",
-        "Contrast": "Normal"
-    },
-    "IV-001452 20260113": {
-        "ImageTone": "Cross Processing 2",
-        "Saturation": "Normal",
-        "Contrast": "Normal"
-    },
-    "Standard": {
-        "ImageTone": "Standard",
-        "Saturation": "Normal",
-        "Contrast": "Normal"
-    },
-    "Vivid": {
-        "ImageTone": "Vivid",
-        "Saturation": "Normal",
-        "Contrast": "High"
-    }
-}
-```
-
-<!-- DISCOVERED RECIPES END -->
+*Developed for the Ricoh GR series.*
