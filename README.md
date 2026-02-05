@@ -103,5 +103,9 @@ Built with a modern stack for performance and aesthetics:
 
 This project is dedicated to the Ricoh GR community. If you encounter any issues, have feature requests, or want to contribute, please use the **[GitHub Issues](https://github.com/pbeens/Tag-Ricoh-GR-Recipes/issues)** area of this repository.
 
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
 ---
 *Developed for the Ricoh GR series.*

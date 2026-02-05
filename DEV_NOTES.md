@@ -363,6 +363,7 @@
 ### Windows Notes (For Anti-Gravity)
 
 **What Windows still needs**:
+
 - Place a Windows ExifTool binary at `resources/exiftool.exe` (rename `exiftool(-k).exe` to `exiftool.exe`).
 - Add an `extraResources` entry for `resources/exiftool.exe` in `package.json` build config.
 
@@ -416,6 +417,18 @@
 - **Verification**:
   - [ ] **Review**: Open `CHANGELOG.md` and confirm the entries reflect the current release.
 
+## Iteration 35: Project Licensing
+
+**Timestamp**: 2026-02-05 09:42 - 09:43
+
+- **Goal**: Formalize the project's open-source status with a standard license.
+- **Action**:
+  - Created an MIT `LICENSE` file.
+  - Updated `package.json` and `README.md` to reflect the change.
+- **Verification**:
+  - [ ] **License Check**: Open `LICENSE` and verify the copyright year and name (2026 Peter Beens).
+  - [ ] **Metadata Check**: Confirm `package.json` contains `"license": "MIT"`.
+
 ## Backlog & Feature Ideas
 
 ### Things to Do
@@ -437,5 +450,3 @@
 - [ ] **Custom Tagging**: Allow users to manually override a recipe if the metadata is missing.
 - [ ] **Export History**: Export the tagging logs as a CSV for photography records.
 - [ ] **Automated Updates**: Check for new bundled ExifTool versions.
-
-
