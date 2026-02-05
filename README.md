@@ -6,6 +6,8 @@ A premium desktop application designed for Ricoh GR photographers to automatical
   <img src="resources/screenshot.png" alt="Ricoh GR Image Tagger Screenshot" width="50%">
 </a>
 
+*Click to enlarge*
+
 ## Overview
 
 The Ricoh GR Image Tagger streamlines your post-processing workflow by automatically extracting the **Image Tone** (e.g., "Negative Film", "Positive Film") from your photos' EXIF data and writing it to the **Keywords** and **Subject** tags. This makes your recipes searchable in Adobe Lightroom and Capture One.
