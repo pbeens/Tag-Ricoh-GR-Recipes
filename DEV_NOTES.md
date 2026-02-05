@@ -207,6 +207,7 @@
 - [ ] Implement production build/packaging script (Iteration 17+).
 - [ ] Create official GitHub release v1.0.0 on repository.
 - [ ] Add an "Official Website" or "GitHub Repo" link in the sidebar.
+- [ ] Add a screenshot of the program to the `README.md` file.
 
 ### Things to Verify
 
