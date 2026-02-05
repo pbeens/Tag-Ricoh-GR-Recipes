@@ -42,4 +42,8 @@ Convert the Python-based tagging logic into a premium, user-friendly desktop app
 - **Pathing**: Handling Windows paths with spaces correctly in Node/ExifTool.
 - **Performance**: Asynchronously processing batches of high-resolution images to keep the UI responsive.
 
+## Development Notes
+
 Put every development iteration, successful or not, in the `DEV_NOTES.md` file. Include the date and time of each iteration, and a **Verification** section providing clear instructions for the user to test and validate the changes.
+
+Additionally, maintain a **Backlog & Feature Ideas** section at the end of `DEV_NOTES.md` to track planned improvements, things to verify in the future, and new feature requests.

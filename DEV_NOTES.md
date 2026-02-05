@@ -183,8 +183,40 @@
 - **Verification**:
   - [ ] **README Review**: Confirm the footer says "Developed for the Ricoh GR series."
 
+## Iteration 16: Project Planning Stabilization
+
+**Timestamp**: 2026-02-04 21:36 - 21:38
+
+- **Goal**: Introduce a formal section for tracking project growth and future tasks.
+- **Action**:
+  - Updated `Gemini.md` to mandate a "Backlog & Feature Ideas" section.
+  - Added the initial backlog to the project documentation.
+- **Verification**:
+  - [ ] **Section Check**: Scroll to the bottom of `DEV_NOTES.md` and confirm the "Backlog & Feature Ideas" section exists.
+
 ## Current Status
 
 - **Dev Mode**: Fully functional with `npm run dev`.
 - **UI**: Premium matching design proposal.
-- **Features**: Drag-and-drop JPEG tagging working; custom window controls active.
+- **Features**: Drag-and-drop JPEG tagging working; custom window controls active; Git clean.
+
+## Backlog & Feature Ideas
+
+### Things to Do
+
+- [ ] Implement production build/packaging script (Iteration 17+).
+- [ ] Create official GitHub release v1.0.0 on repository.
+- [ ] Add an "Official Website" or "GitHub Repo" link in the sidebar.
+
+### Things to Verify
+
+- [ ] **History Sidebar**: Investigate why images don't appear in the right-hand sidebar during/after the tagging process.
+- [ ] **Cross-Platform**: Test UI aesthetics on macOS/Linux (currently optimized for Windows).
+- [ ] **Large Batches**: Test performance with 500+ images in a single drop.
+
+### Features to Add
+
+- [ ] **Image Previews**: Hover over a history item to see a small thumbnail of the image.
+- [ ] **Custom Tagging**: Allow users to manually override a recipe if the metadata is missing.
+- [ ] **Export History**: Export the tagging logs as a CSV for photography records.
+- [ ] **Automated Updates**: Check for new bundled ExifTool versions.
