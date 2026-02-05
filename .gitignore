@@ -13,3 +13,5 @@ resources/exiftool.exe
 resources/exiftool-mac/
 Test_Images_All_Full_Size.zip
 Test-Images/Archive.zip
+Test-Images/*.JPG
+
