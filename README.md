@@ -105,6 +105,15 @@ Built with a modern stack for performance and aesthetics:
 - **Metadata Engine**: Bundles ExifTool in release builds for robust industry-standard metadata handling.
 - **Design**: custom Vanilla CSS with dark-mode optimizations.
 
+## Camera Compatibility
+
+As this is a community project, compatibility is currently limited to tested models:
+
+- **Verified**: Ricoh GR IV
+- **Unverified**: Other Ricoh GR series models (III, IIIx, II, etc.)
+
+If you test this with other models and it works (or doesn't), please let me know via a [GitHub Issue](https://github.com/pbeens/Tag-Ricoh-GR-Recipes/issues)!
+
 ## Community & Support
 
 This project is dedicated to the Ricoh GR community. If you encounter any issues, have feature requests, or want to contribute, please use the **[GitHub Issues](https://github.com/pbeens/Tag-Ricoh-GR-Recipes/issues)** area of this repository.
