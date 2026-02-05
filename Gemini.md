@@ -46,8 +46,8 @@ Convert the Python-based tagging logic into a premium, user-friendly desktop app
 
 To provide a consistent environment for testing, use the provided test assets:
 
-- **Test Asset**: `Test_Images.zip` contains a collection of untagged images.
-- **Workflow**: Extract the contents of `Test_Images.zip` into the `Test-Images` folder (overwriting if necessary) to reset your testing environment with fresh, untagged images.
+- **Test Asset**: `Test-Images.zip` contains a collection of untagged images.
+- **Workflow**: Extract the contents of `Test-Images.zip` into the `Test-Images` folder (overwriting if necessary) to reset your testing environment with fresh, untagged images.
 
 ## Development Notes
 
