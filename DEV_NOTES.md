@@ -429,18 +429,36 @@
   - [ ] **License Check**: Open `LICENSE` and verify the copyright year and name (2026 Peter Beens).
   - [ ] **Metadata Check**: Confirm `package.json` contains `"license": "MIT"`.
 
+## Iteration 36: Version 1.1.0 - Metadata Options & EV Support
+
+**Timestamp**: 2026-02-10 00:00 - 00:35
+
+- **Goal**: Add user-selectable metadata options (EV, ISO, WB) and persistent settings.
+- **Action**:
+  - Updated main process IPC handlers to support generic metadata extraction and multi-tagging.
+  - Added a compact "Metadata Options" panel to the renderer UI.
+  - Implemented `localStorage` persistence for metadata toggles and app settings.
+  - Linked app version display in the custom title bar.
+  - Added "Select All" and "Select None" bulk actions for options.
+  - Refined UI CSS for a single-row horizontal layout of options.
+  - Fixed a preload script mismatch that was breaking the bridge for `getImageMetadata`.
+- **Verification**:
+  - [x] **Tag Check**: Dropped Ricoh GR JPEGs and verified `Keywords` and `Subject` contain all selected metadata (EV, ISO, WB).
+  - [x] **Persistence Check**: Restarted app and confirmed checkbox states were restored.
+  - [x] **UI Check**: Confirmed version `v1.1.0` is visible in the title bar and layout is compact.
+
 ## Backlog & Feature Ideas
 
 ### Things to Do
 
-- [ ] Implement production build/packaging script (Iteration 17+).
-- [ ] Create official GitHub release v1.0.0 on repository.
+- [x] Implement production build/packaging script (Iteration 17+).
+- [ ] Create official GitHub release v1.1.0 on repository.
 - [ ] Add an "Official Website" or "GitHub Repo" link in the sidebar.
 - [ ] Add a screenshot of the program to the `README.md` file.
 
 ### Things to Verify
 
-- [ ] **History Sidebar**: Investigate why images don't appear in the right-hand sidebar during/after the tagging process.
+- [x] **History Sidebar**: Fixed issues where tags appeared incorrectly or missing in history.
 - [ ] **Cross-Platform**: Test UI aesthetics on macOS/Linux (currently optimized for Windows).
 - [ ] **Large Batches**: Test performance with 500+ images in a single drop.
 

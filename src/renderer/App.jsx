@@ -8,7 +8,16 @@ function App() {
     const [history, setHistory] = useState([])
     const [status, setStatus] = useState('Ready to tag')
 
+    const [options, setOptions] = useState({
+        ev: true,
+        iso: true,
+        wb: true
+    })
+
+    const [version, setVersion] = useState('')
+
     const HISTORY_KEY = 'tagger.history.v1'
+    const OPTIONS_KEY = 'tagger.options.v1'
     const MAX_HISTORY = 50
 
     const saveHistory = useCallback((items) => {
@@ -17,6 +26,31 @@ function App() {
         } catch (err) {
             console.warn('Unable to save history', err)
         }
+    }, [])
+
+    const saveOptions = useCallback((opts) => {
+        try {
+            localStorage.setItem(OPTIONS_KEY, JSON.stringify(opts))
+        } catch (err) {
+            console.warn('Unable to save options', err)
+        }
+    }, [])
+
+    useEffect(() => {
+        const init = async () => {
+            const v = await window.api.getAppVersion()
+            setVersion(v)
+
+            const stored = localStorage.getItem(OPTIONS_KEY)
+            if (stored) {
+                try {
+                    setOptions(JSON.parse(stored))
+                } catch (err) {
+                    console.warn('Unable to parse stored options', err)
+                }
+            }
+        }
+        init()
     }, [])
 
     useEffect(() => {
@@ -66,6 +100,23 @@ function App() {
         setIsDragging(false)
     }
 
+    const toggleOption = (key) => {
+        setOptions(prev => {
+            const updated = { ...prev, [key]: !prev[key] }
+            saveOptions(updated)
+            return updated
+        })
+    }
+
+    const setAllOptions = (value) => {
+        const updated = Object.keys(options).reduce((acc, key) => {
+            acc[key] = value
+            return acc
+        }, {})
+        setOptions(updated)
+        saveOptions(updated)
+    }
+
     const onDrop = async (e) => {
         e.preventDefault()
         setIsDragging(false)
@@ -87,16 +138,34 @@ function App() {
             const filePath = window.api.getPathForFile(file) || file.path
 
             try {
-                const metadata = await window.api.getImageTone(filePath)
-                if (!metadata || !metadata[0] || !metadata[0].ImageTone) {
+                const metadataList = await window.api.getImageMetadata(filePath)
+                if (!metadataList || !metadataList[0]) {
+                    setStatus(`Metadata error for ${file.name}`)
+                    continue
+                }
+
+                const metadata = metadataList[0]
+                const tone = metadata.ImageTone
+                if (!tone) {
                     setStatus(`No ImageTone found for ${file.name}`)
                     continue
                 }
 
-                const tone = metadata[0].ImageTone
-                const finalTag = `${tone} Film Recipe`
+                const tags = [`${tone} Film Recipe`]
 
-                const tagResult = await window.api.tagImage(filePath, finalTag)
+                if (options.ev && metadata.ExposureCompensation !== undefined) {
+                    const evVal = parseFloat(metadata.ExposureCompensation)
+                    const evStr = evVal >= 0 ? `+${evVal}` : `${evVal}`
+                    tags.push(`EV: ${evStr}`)
+                }
+                if (options.iso && metadata.ISO) {
+                    tags.push(`ISO: ${metadata.ISO}`)
+                }
+                if (options.wb && metadata.WhiteBalance) {
+                    tags.push(`WB: ${metadata.WhiteBalance}`)
+                }
+
+                const tagResult = await window.api.tagImage(filePath, tags)
                 if (tagResult && tagResult.skipped) {
                     setStatus(`Already tagged: ${file.name}`)
                     continue
@@ -109,6 +178,7 @@ function App() {
                         filename: file.name,
                         filePath,
                         tone: tone,
+                        tags: tags, // Store all tags for display
                         timestamp: new Date().toLocaleTimeString(),
                         previewUrl
                     }, ...prev].slice(0, MAX_HISTORY)
@@ -135,7 +205,7 @@ function App() {
                     <div className="logo">
                         <ImageIcon size={20} color="white" />
                     </div>
-                    <h1>RICOH GR IMAGE TAGGER</h1>
+                    <h1>RICOH GR IMAGE TAGGER {version && `v${version}`}</h1>
                 </div>
                 <div className="window-controls">
                     <button className="control-btn minimize" onClick={() => window.api.minimize()} />
@@ -145,6 +215,29 @@ function App() {
 
             <div className="app-layout">
                 <main className="main-content">
+                    <section className="options-panel">
+                        <div className="options-header">
+                            <h3>Metadata Options</h3>
+                            <div className="bulk-actions">
+                                <button onClick={() => setAllOptions(true)}>All</button>
+                                <button onClick={() => setAllOptions(false)}>None</button>
+                            </div>
+                        </div>
+                        <div className="options-grid">
+                            <label className={`option-chip ${options.ev ? 'active' : ''}`}>
+                                <input type="checkbox" checked={options.ev} onChange={() => toggleOption('ev')} />
+                                <span>Exposure (EV)</span>
+                            </label>
+                            <label className={`option-chip ${options.iso ? 'active' : ''}`}>
+                                <input type="checkbox" checked={options.iso} onChange={() => toggleOption('iso')} />
+                                <span>ISO</span>
+                            </label>
+                            <label className={`option-chip ${options.wb ? 'active' : ''}`}>
+                                <input type="checkbox" checked={options.wb} onChange={() => toggleOption('wb')} />
+                                <span>White Balance</span>
+                            </label>
+                        </div>
+                    </section>
                     <div
                         className={`drop-zone ${isDragging ? 'active' : ''}`}
                         onDragOver={onDragOver}
@@ -195,7 +288,12 @@ function App() {
                                     ) : null}
                                     <div className="history-meta">
                                         <span className="filename">{item.filename}</span>
-                                        <span className="tag">{item.tone}</span>
+                                        <div className="tag-cloud">
+                                            <span className="tag tone">{item.tone}</span>
+                                            {item.tags && item.tags.slice(1).map((t, idx) => (
+                                                <span key={idx} className="tag extra">{t}</span>
+                                            ))}
+                                        </div>
                                     </div>
                                 </div>
                             ))

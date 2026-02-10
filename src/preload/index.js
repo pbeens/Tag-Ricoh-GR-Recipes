@@ -12,10 +12,11 @@ const api = {
       return null
     }
   },
-  getImageTone: (filePath) => ipcRenderer.invoke('get-image-tone', filePath),
-  tagImage: (filePath, tone) => ipcRenderer.invoke('tag-image', filePath, tone),
+  getImageMetadata: (filePath) => ipcRenderer.invoke('get-image-metadata', filePath),
+  tagImage: (filePath, tags) => ipcRenderer.invoke('tag-image', filePath, tags),
   fileExists: (filePath) => ipcRenderer.invoke('file-exists', filePath),
   getThumbnail: (filePath, size) => ipcRenderer.invoke('get-thumbnail', filePath, size),
+  getAppVersion: () => ipcRenderer.invoke('get-app-version'),
   minimize: () => ipcRenderer.send('window-minimize'),
   maximize: () => ipcRenderer.send('window-maximize'),
   close: () => ipcRenderer.send('window-close'),

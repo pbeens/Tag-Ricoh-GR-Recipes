@@ -47,34 +47,59 @@ app.whenReady().then(() => {
   })
 
   // IPC handlers
-  ipcMain.handle('get-image-tone', async (event, filePath) => {
-    return await runExifTool(['-json', '-ImageTone', filePath])
+  ipcMain.handle('get-image-metadata', async (event, filePath) => {
+    return await runExifTool([
+      '-json',
+      '-ImageTone',
+      '-ExposureCompensation',
+      '-ISO',
+      '-WhiteBalance',
+      '-WBShiftAM',
+      '-WBShiftBG',
+      '-DynamicRangeExpansion',
+      filePath
+    ])
   })
 
-  ipcMain.handle('tag-image', async (event, filePath, tone) => {
+  ipcMain.handle('tag-image', async (event, filePath, tags) => {
+    // tags is an array of strings
     const existing = await runExifTool(['-json', '-Keywords', '-Subject', filePath])
+    const tagsToAdd = Array.isArray(tags) ? tags : [tags]
+
     if (Array.isArray(existing) && existing[0]) {
-      const keywords = new Set()
+      const currentKeywords = new Set()
       const add = (value) => {
         if (Array.isArray(value)) {
-          value.forEach((v) => keywords.add(String(v)))
+          value.forEach((v) => currentKeywords.add(String(v)))
         } else if (typeof value === 'string') {
-          value.split(',').map((v) => v.trim()).filter(Boolean).forEach((v) => keywords.add(v))
+          value.split(',').map((v) => v.trim()).filter(Boolean).forEach((v) => currentKeywords.add(v))
         }
       }
       add(existing[0].Keywords)
       add(existing[0].Subject)
 
-      if (keywords.has(tone)) {
+      // Filter out tags already present
+      const finalTags = tagsToAdd.filter(t => !currentKeywords.has(t))
+
+      if (finalTags.length === 0) {
         return { skipped: true, reason: 'already-tagged' }
       }
+
+      const exifArgs = [
+        '-P',
+        '-overwrite_original',
+        ...finalTags.map(t => `-Keywords+=${t}`),
+        ...finalTags.map(t => `-Subject+=${t}`),
+        filePath
+      ]
+      return await runExifTool(exifArgs)
     }
 
     return await runExifTool([
       '-P',
       '-overwrite_original',
-      `-Keywords+=${tone}`,
-      `-Subject+=${tone}`,
+      ...tagsToAdd.map(t => `-Keywords+=${t}`),
+      ...tagsToAdd.map(t => `-Subject+=${t}`),
       filePath
     ])
   })
@@ -120,6 +145,8 @@ app.whenReady().then(() => {
   ipcMain.on('app-quit', () => {
     app.quit()
   })
+
+  ipcMain.handle('get-app-version', () => app.getVersion())
 
   createWindow()
 
